@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Iowa Transportation System</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico"/>
+
+    <link rel="stylesheet" href="./leaflet/leaflet.css"/>
+    <script src="./leaflet/leaflet.js"></script>
+    <script src="numeric-1.2.6.js"></script>
+
+    <script src="./data/DataJs.js"></script>
+
+    <script type="application/javascript">
+        var colorA = "#FFFF80";
+        var colorB = "#8080FF";
+        var colorC = "#000000";
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        var local_W = window.document.documentElement.clientWidth;
+        var local_H = window.document.documentElement.clientHeight;
+
+        var CrossSectionsNum = 70;
+        var CrossSections = [[43.098135, -93.380439],
+            [42.447763, -93.610695],
+            [42.463921, -92.463455],
+            [41.619649, -93.626854],
+            [41.696401, -91.586867],
+            [41.508561, -95.470921],
+            [41.981192, -91.635342],
+            [41.011693, -91.495977],
+            [41.072287, -93.828833],
+            [41.332839, -92.659375],
+            [41.03593, -92.410941],
+            [41.653986, -92.744206],
+            [42.502297, -90.581012],
+            [42.465941, -91.877717],
+            [42.490178, -91.065762],
+            [42.078141, -90.581012],
+            [43.04764, -92.683612],
+            [43.041581, -91.089999],
+            [42.138735, -90.132619],
+            [41.835767, -90.096263],
+            [41.532799, -90.502241],
+            [40.84809, -91.053643],
+            [40.696606, -91.277839],
+            [40.460291, -91.344492],
+            [40.799615, -92.410941],
+            [40.775378, -92.877512],
+            [40.672369, -93.992435],
+            [40.551181, -93.016878],
+            [41.048049, -92.859334],
+            [41.096524, -94.42871],
+            [40.799615, -95.125537],
+            [40.823853, -95.489099],
+            [40.75114, -95.985967],
+            [41.429789, -95.119478],
+            [41.011693, -95.131596],
+            [41.248008, -95.95567],
+            [41.52068, -96.034442],
+            [41.52068, -95.701177],
+            [42.496238, -96.549488],
+            [42.023607, -96.301054],
+            [42.362932, -95.604227],
+            [42.750731, -95.66482],
+            [42.041785, -95.470921],
+            [41.557036, -94.568075],
+            [43.283955, -96.743388],
+            [42.817384, -96.313173],
+            [43.174887, -95.992026],
+            [43.23548, -96.325291],
+            [43.065818, -94.295404],
+            [43.126412, -95.246724],
+            [42.072082, -94.955875],
+            [42.635603, -95.301259],
+            [42.326575, -95.113418],
+            [43.102174, -94.774094],
+            [42.459882, -95.180071],
+            [42.459882, -94.259048],
+            [42.726494, -94.277226],
+            [42.029667, -93.616755],
+            [43.411202, -95.204309],
+            [43.290015, -91.768648],
+            [43.374846, -94.271166],
+            [43.326371, -92.792681],
+            [43.33849, -93.37438],
+            [42.017548, -92.574544],
+            [42.023607, -93.350143],
+            [42.459882, -93.295608],
+            [43.053699, -92.313991],
+            [43.308193, -92.289754],
+            [43.417261, -95.846601],
+            [42.472, -92.217041],
+        ];
+
+
+        var LinkagesNumber = 224;
+        var Linkages = [[1, 2],
+            [2, 1],
+            [3, 5],
+            [5, 3],
+            [5, 7],
+            [7, 5],
+            [5, 8],
+            [8, 5],
+            [4, 9],
+            [9, 4],
+            [11, 8],
+            [8, 11],
+            [4, 10],
+            [10, 4],
+            [10, 11],
+            [11, 10],
+            [4, 12],
+            [12, 5],
+            [5, 12],
+            [12, 4],
+            [14, 15],
+            [15, 13],
+            [13, 15],
+            [15, 14],
+            [7, 16],
+            [16, 7],
+            [13, 16],
+            [16, 13],
+            [1, 17],
+            [17, 1],
+            [17, 3],
+            [3, 17],
+            [18, 13],
+            [13, 18],
+            [13, 19],
+            [19, 13],
+            [19, 20],
+            [20, 19],
+            [20, 21],
+            [21, 20],
+            [5, 21],
+            [21, 5],
+            [22, 8],
+            [8, 22],
+            [21, 22],
+            [22, 21],
+            [16, 21],
+            [21, 16],
+            [22, 23],
+            [23, 22],
+            [23, 24],
+            [24, 23],
+            [8, 24],
+            [24, 8],
+            [11, 25],
+            [25, 11],
+            [9, 29],
+            [29, 11],
+            [11, 29],
+            [29, 9],
+            [29, 26],
+            [26, 29],
+            [26, 28],
+            [28, 26],
+            [28, 27],
+            [27, 28],
+            [28, 25],
+            [25, 28],
+            [25, 24],
+            [24, 25],
+            [33, 32],
+            [32, 33],
+            [32, 31],
+            [31, 32],
+            [31, 27],
+            [27, 31],
+            [34, 35],
+            [35, 31],
+            [31, 35],
+            [35, 34],
+            [35, 30],
+            [30, 35],
+            [30, 9],
+            [9, 30],
+            [9, 27],
+            [27, 9],
+            [36, 33],
+            [33, 36],
+            [37, 38],
+            [38, 6],
+            [6, 38],
+            [38, 37],
+            [38, 36],
+            [36, 38],
+            [37, 36],
+            [36, 37],
+            [39, 40],
+            [40, 37],
+            [37, 40],
+            [40, 39],
+            [40, 41],
+            [41, 40],
+            [42, 41],
+            [41, 42],
+            [41, 43],
+            [43, 41],
+            [43, 6],
+            [6, 43],
+            [37, 43],
+            [43, 37],
+            [6, 44],
+            [44, 4],
+            [4, 44],
+            [44, 6],
+            [34, 44],
+            [44, 34],
+            [36, 34],
+            [34, 36],
+            [39, 45],
+            [45, 39],
+            [45, 48],
+            [48, 47],
+            [47, 48],
+            [48, 45],
+            [48, 46],
+            [46, 48],
+            [46, 39],
+            [39, 46],
+            [46, 47],
+            [47, 46],
+            [39, 41],
+            [41, 39],
+            [47, 42],
+            [42, 47],
+            [47, 50],
+            [50, 47],
+            [43, 51],
+            [51, 43],
+            [53, 51],
+            [51, 53],
+            [42, 52],
+            [52, 42],
+            [50, 52],
+            [52, 50],
+            [50, 54],
+            [54, 49],
+            [49, 54],
+            [54, 50],
+            [52, 55],
+            [55, 53],
+            [53, 55],
+            [55, 52],
+            [55, 56],
+            [56, 2],
+            [2, 56],
+            [56, 55],
+            [49, 1],
+            [1, 49],
+            [49, 57],
+            [57, 56],
+            [56, 57],
+            [57, 49],
+            [2, 58],
+            [58, 4],
+            [4, 58],
+            [58, 2],
+            [51, 58],
+            [58, 51],
+            [59, 61],
+            [61, 59],
+            [61, 63],
+            [63, 62],
+            [62, 63],
+            [63, 61],
+            [59, 50],
+            [50, 59],
+            [61, 49],
+            [49, 61],
+            [63, 1],
+            [1, 63],
+            [62, 17],
+            [17, 62],
+            [60, 18],
+            [18, 60],
+            [64, 7],
+            [7, 64],
+            [3, 64],
+            [64, 3],
+            [58, 65],
+            [65, 64],
+            [64, 65],
+            [65, 58],
+            [2, 66],
+            [66, 3],
+            [3, 66],
+            [66, 2],
+            [66, 65],
+            [65, 66],
+            [64, 12],
+            [12, 64],
+            [17, 67],
+            [67, 18],
+            [18, 67],
+            [67, 17],
+            [67, 3],
+            [3, 67],
+            [62, 68],
+            [68, 60],
+            [60, 68],
+            [68, 62],
+            [68, 67],
+            [67, 68],
+            [69, 47],
+            [47, 69],
+            [69, 59],
+            [59, 69],
+            [3, 70],
+            [70, 14],
+            [14, 70],
+            [70, 3],
+            [70, 7],
+            [7, 70],
+            [51, 34],
+            [34, 51],
+        ];
+
+        var MinBound = [40.4603, -96.7434];
+        var MaxBound = [43.4173, -90.0963];
+
+        //city name
+        var CityName = ["	Clear Lake	",
+            "	Williams	",
+            "	Cedar Falls	",
+            "	Des Moines	",
+            "	Coralville	",
+            "	Avoca	",
+            "	Cedar Rapids	",
+            "	Mt Pleasant	",
+            "	Osceola	",
+            "	Oskaloosa	",
+            "	Ottumwa	",
+            "	Malcom	",
+            "	Dubuque	",
+            "	Independence	",
+            "	Dyersville	",
+            "	Maquoketa	",
+            "	Charles City	",
+            "	Prairie du Chien	",
+            "	Sabula	",
+            "	Clinton	",
+            "	Davenport	",
+            "	Burlington	",
+            "	Fort Madison	",
+            "	Keokuk	",
+            "	Bloomfield	",
+            "	Centerville	",
+            "	Lamoni	",
+            "	Lineville	",
+            "	Albia	",
+            "	Creston	",
+            "	Clarinda	",
+            "	Shenandoah	",
+            "	Percival	",
+            "	Atlantic	",
+            "	Villisca	",
+            "	Council Bluffs	",
+            "	Missouri Valley	",
+            "	Minden	",
+            "	Sioux City	",
+            "	Onawa	",
+            "	Ida Grove	",
+            "	Cherokee	",
+            "	Denison	",
+            "	Menlo	",
+            "	Sioux Falls	",
+            "	Le Mars	",
+            "	Sheldon	",
+            "	Hull	",
+            "	Algona	",
+            "	Spencer	",
+            "	Carroll	",
+            "	Storm Lake	",
+            "	Lake View	",
+            "	Emmetsburg	",
+            "	Sac City	",
+            "	Fort Dodge	",
+            "	Humboldt	",
+            "	Ames	",
+            "	Spirit Lake	",
+            "	Decorah	",
+            "	Swea City	",
+            "	Osage	",
+            "	Manly	",
+            "	Tama	",
+            "	Colo	",
+            "	Iowa Falls	",
+            "	New Hampton	",
+            "	Cresco	",
+            "	Sibley	",
+            "	Poyner	",
+        ];
+
+
+        function main() {
+
+            var Map_DIV = document.getElementById("Map_DIV");
+            Map_DIV.style.position = "absolute";
+            Map_DIV.style.width = 0.95 * local_W + "px";
+            Map_DIV.style.height = 18. / 20 * local_H + "px";
+            Map_DIV.style.top = 1.0 / 20 * local_H + "px";
+            Map_DIV.style.left = 0 + "px";
+
+            var southWest = L.latLng(40.4603, -96.7434),
+                northEast = L.latLng(43.4173, -90.0963),
+                bounds = L.latLngBounds(southWest, northEast);
+            //var MapArea = L.map("Map_DIV").setView([42, -93.66943], 8);
+            var myCenter = new L.LatLng(42, -93.66943);
+            var MapArea = L.map("Map_DIV", {center: myCenter, zoom: 7.5, closePopupOnClick: false, maxBounds: bounds});
+            MapArea.setMaxBounds(bounds);
+            //L.map("Map_DIV").fitBounds([40.4603, -96.7434   ], [43.4173, -90.0963   ]);//
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(MapArea);
+
+
+            var MarkerList = addMarker(MapArea);
+            var GreenPath = -1;
+            addPath(MapArea, GreenPath);
+
+
+            ///////////////////////////////////////////
+            var Canvas_For_ColorLegend = document.createElement("CANVAS");
+            Canvas_For_ColorLegend.style.position = "absolute";
+            Canvas_For_ColorLegend.id = "Canvas_For_ColorLegend";
+            Canvas_For_ColorLegend.style.left = 0.95 * local_W + "px";
+            Canvas_For_ColorLegend.style.top = 0.05 * local_H + "px";
+            Canvas_For_ColorLegend.style.height = 18. / 20 * local_H + "px";
+            Canvas_For_ColorLegend.style.width = 0.05 * local_W + "px";
+            Canvas_For_ColorLegend.height = 18. / 20 * local_H;
+            Canvas_For_ColorLegend.width = 0.05 * local_W;
+            var Canvas_For_DrawLegend = Canvas_For_ColorLegend.getContext("2d");
+            var colorA = "#FFFF80";
+            var colorB = "#8080FF";
+            var colorC = "#000000";
+            var LocalColor = colorC;
+            var MaxSteps = 20;
+            for (var i = 0; i < MaxSteps; i++) {
+                if (1)//(i%10==0)
+                {
+                    Canvas_For_DrawLegend.fillStyle = "#000000";
+                    var fontsize = 0.01 * local_W > 0.90 * local_H / MaxSteps ? 0.90 * local_H / MaxSteps : 0.01 * local_W;
+                    Canvas_For_DrawLegend.font = fontsize + "px Arial";
+                    Canvas_For_DrawLegend.textAlign = "left";
+                    Canvas_For_DrawLegend.fillText(300 * (i + 1), 0.02 * local_W, (MaxSteps - i - 0.5) * 0.90 * local_H / MaxSteps);
+                }
+                Canvas_For_DrawLegend.fillStyle = "#000000";
+                Canvas_For_DrawLegend.strokeRect(0.01 * local_W, (MaxSteps - i - 1) * 0.90 * local_H / MaxSteps, 0.01 * local_W, 0.90 * local_H / MaxSteps);
+
+                Canvas_For_DrawLegend.fillStyle = hsv2rgb(i, 0, MaxSteps - 1);
+                Canvas_For_DrawLegend.fillRect(0.01 * local_W, (MaxSteps - i - 1) * 0.90 * local_H / MaxSteps, 0.01 * local_W, 0.90 * local_H / MaxSteps);
+            }
+            document.body.appendChild(Canvas_For_ColorLegend);
+            // add the button to draw the map
+            var Button_Draw_Path = document.createElement("BUTTON");
+            Button_Draw_Path.style.position = "absolute";
+            Button_Draw_Path.style.left = 2. / 3 * local_W + "px";
+            Button_Draw_Path.style.top = 0. / 10 * local_H + "px";
+            Button_Draw_Path.style.height = 1. / 20 * local_H + "px";
+            Button_Draw_Path.style.width = 1. / 3 * local_W + "px";
+            Button_Draw_Path.style.fontSize = 16 + "px";
+            Button_Draw_Path.style.fontWeight = "bold";
+            Button_Draw_Path.innerHTML = "Draw Flow on Map";
+            Button_Draw_Path.id = "Button_Draw_Path";
+            Button_Draw_Path.onclick = function () {
+                addPath(MapArea, Actions.length * SelectedIndexA + SelectedIndexS);
+            };
+            document.body.appendChild(Button_Draw_Path);
+
+            var SelectedIndexA = 0;
+            var SelectedIndexS = 0;
+
+            // add a select to the page
+            var Select_A = document.createElement("SELECT");
+            Select_A.style.position = "absolute";
+            Select_A.style.left = 0. / 3 * local_W + "px";
+            Select_A.style.top = 0. / 10 * local_H + "px";
+            Select_A.style.height = 1. / 20 * local_H + "px";
+            Select_A.style.width = 1. / 3 * local_W + "px";
+            Select_A.style.fontSize = 16 + "px";
+            Select_A.style.fontWeight = "bold";
+            Select_A.id = "Select_A";
+            Select_A.onchange = function () {
+                SelectedIndexA = parseInt(Select_A.options[Select_A.selectedIndex].value);
+                clearMap(MapArea);
+
+
+                var timeArray = [];
+                for (var i = 0; i < Scenarios.length; i++) {
+                    timeArray.push(ObjValue[Actions.length * SelectedIndexA + i]);
+                }
+
+                var MaxIndex = timeArray.indexOf(Math.max(...timeArray)
+                )
+                ;
+
+                var Select_S = document.getElementById("Select_S");
+                Select_S.options.length = 0;
+                for (var i = 0; i < Scenarios.length; i++) {
+                    var optionS = document.createElement("option");
+                    optionS.setAttribute("value", i);
+
+                    if (i == MaxIndex) {
+                        optionS.text = "Select Scenario #" + (i + 1) + "(*)time:" + Math.trunc(ObjValue[Actions.length * SelectedIndexA + i]);
+                    }
+                    else {
+                        optionS.text = "Select Scenario #" + (i + 1) + "   time:" + Math.trunc(ObjValue[Actions.length * SelectedIndexA + i]);
+                    }
+                    Select_S.appendChild(optionS);
+                }
+
+            };
+
+            for (var i = 0; i < Actions.length; i++) {
+                var optionA = document.createElement("option");
+                optionA.setAttribute("value", i);
+                optionA.text = "Select Action #" + (i + 1);
+                Select_A.appendChild(optionA);
+            }
+            document.body.appendChild(Select_A);
+            var Select_S = document.createElement("SELECT");
+            Select_S.style.position = "absolute";
+            Select_S.style.left = 1. / 3 * local_W + "px";
+            Select_S.style.top = 0. / 10 * local_H + "px";
+            Select_S.style.height = 1. / 20 * local_H + "px";
+            Select_S.style.width = 1. / 3 * local_W + "px";
+            Select_S.style.fontSize = 16 + "px";
+            Select_S.style.fontWeight = "bold";
+            Select_S.id = "Select_S";
+            Select_S.onchange = function () {
+                SelectedIndexS = parseInt(Select_S.options[Select_S.selectedIndex].value);
+                clearMap(MapArea);
+            };
+            for (var i = 0; i < Scenarios.length; i++) {
+                var optionS = document.createElement("option");
+                optionS.setAttribute("value", i);
+                optionS.text = "Select Scenario #" + (i + 1);
+                Select_S.appendChild(optionS);
+            }
+            document.body.appendChild(Select_S);
+
+            creditAppendix();
+
+
+        }
+
+        // add marker
+        function addMarker(MapArea) {
+            var MarkerList = [];
+            for (var i = 0; i < CrossSectionsNum; i++) {
+                var marker = L.marker(CrossSections[i]).bindPopup("<b>city " + (i + 1).toString() + "</b><br>" + CityName[i], {autoClose: false});//.openPopup();
+                MapArea.addLayer(marker);
+                MarkerList.push(marker);
+            }
+            return MarkerList;
+        }
+
+        function openMarker(markers, Index) {
+            markers[Index].openPopup();
+        }
+
+        // add path to the map
+        function addPath(MapArea, CaseIndex) {
+            if (CaseIndex >= 0) {
+                var MaxSteps = 20;
+                var FlowData2Draw = AllFlows[CaseIndex];
+                var MaxFlow = Math.max(...FlowData2Draw            )                ;
+                var MinFlow = Math.min(...FlowData2Draw            )                ;
+
+                var Canvas_For_ColorLegend = document.getElementById("Canvas_For_ColorLegend");
+                var Canvas_For_DrawLegend = Canvas_For_ColorLegend.getContext("2d");
+                Canvas_For_DrawLegend.clearRect(0.02 * local_W, 0, 0.03 * local_W, (MaxSteps) * 0.8 * local_H / MaxSteps);
+
+                for (var i = 0; i < MaxSteps; i++) {
+                    Canvas_For_DrawLegend.fillStyle = "#000000";
+                    var fontsize = 0.01 * local_W > 0.8 * local_H / MaxSteps ? 0.8 * local_H / MaxSteps : 0.01 * local_W;
+                    Canvas_For_DrawLegend.font = fontsize + "px Arial";
+                    Canvas_For_DrawLegend.textAlign = "left";
+                    Canvas_For_DrawLegend.fillText((i + 1) * (MaxFlow - MinFlow) / MaxSteps, 0.02 * local_W, (MaxSteps - i) * 0.8 * local_H / MaxSteps);
+                }
+            }
+
+            var ColorG = "#00FF00";
+            var ColorR = "#FF0000";
+
+
+
+            var pointA = [];
+            var pointB = [];
+            var pointList = [];
+            var PolyLineSection = [];//PolyLineSection
+            for (var i = 0; i < LinkagesNumber; i++) {
+                var x = numeric.random([1])[0];
+                var DrawColor = hsv2rgb(x, 0, 1);
+                if (CaseIndex == -1 || CaseIndex == undefined) {
+                    DrawColor = ColorG;
+                }
+                else {
+                    DrawColor = hsv2rgb(FlowData2Draw[i], MinFlow, MaxFlow);
+                }
+
+                pointA = [];
+                pointB = [];
+                pointList = [];
+                PolyLineSection = [];
+
+                pointA = new L.LatLng(CrossSections[Linkages[i][0] - 1][0], CrossSections[Linkages[i][0] - 1][1]);
+
+                pointB = new L.LatLng(CrossSections[Linkages[i][1] - 1][0], CrossSections[Linkages[i][1] - 1][1]);
+                //alert("pointA: "+pointA);
+                pointList = [pointA, pointB];
+
+                // black back ground with bold size
+                PolyLineSection = new L.Polyline(pointList, {
+                    color: "#000000",//hsv2rgb(x,0,1),//'#'+ Math.round(x*255).toString(16)+Math.round(x*255).toString(16)+'00',
+                    weight: 6,
+                    opacity: 0.5,
+                    smoothFactor: 1
+                });
+                PolyLineSection.addTo(MapArea);
+
+                // clear some area for the color plot
+                PolyLineSection = new L.Polyline(pointList, {
+                    color: "#FFFFFF",//hsv2rgb(x,0,1),//'#'+ Math.round(x*255).toString(16)+Math.round(x*255).toString(16)+'00',
+                    weight: 3,
+                    opacity: 0.5,
+                    smoothFactor: 1
+                });
+                PolyLineSection.addTo(MapArea);
+
+                //plot the color thing on the map
+                PolyLineSection = new L.Polyline(pointList, {
+                    color: DrawColor,//'#'+ Math.round(x*255).toString(16)+Math.round(x*255).toString(16)+'00',
+                    weight: 3,
+                    opacity: 0.5,
+                    smoothFactor: 1
+                });
+                PolyLineSection.addTo(MapArea);
+
+            }
+
+        }
+
+        function clearMap(m) {
+            for (i in m._layers) {
+                if (m._layers[i]._path != undefined) {
+                    try {
+                        m.removeLayer(m._layers[i]);
+                    }
+                    catch (e) {
+                        console.log("problem with " + e + m._layers[i]);
+                    }
+                }
+            }
+        }
+
+        function wait(ms) {
+            var start = new Date().getTime();
+            var end = start;
+            while (end < start + ms) {
+                end = new Date().getTime();
+            }
+        }
+
+        // make the colors for the connections
+        function hsv2rgb(val, MinVal, MaxVal) {
+            if (val > MaxVal) {
+                val = MaxVal;
+            }
+            if (val < MinVal) {
+                val = MinVal;
+            }
+            var MidVal = (MinVal + MaxVal) / 2;
+            var h = Math.floor((MaxVal - val) * 120 / MaxVal);
+            var s = Math.abs(val - MidVal) / MidVal;
+            var v = 1;
+            var rgb, i, data = [];
+            if (s === 0) {
+                rgb = [v, v, v];
+            }
+            else {
+                h = h / 60;
+                i = Math.floor(h);
+                data = [v * (1 - s), v * (1 - s * (h - i)), v * (1 - s * (1 - (h - i)))];
+                switch (i) {
+                    case 0:
+                        rgb = [v, data[2], data[0]];
+                        break;
+                    case 1:
+                        rgb = [data[1], v, data[0]];
+                        break;
+                    case 2:
+                        rgb = [data[0], v, data[2]];
+                        break;
+                    case 3:
+                        rgb = [data[0], data[1], v];
+                        break;
+                    case 4:
+                        rgb = [data[2], data[0], v];
+                        break;
+                    default:
+                        rgb = [v, data[0], data[1]];
+                        break;
+                }
+            }
+            return '#' + rgb.map(function (x) {
+                    return ("0" + Math.round(x * 255).toString(16)).slice(-2);
+                }).join('');
+        }
+
+        /////////////////////////////////////////////////
+        /////////////////////////////////////////////////
+        // add some credit record for this program
+        function creditAppendix() {
+            // add the title text for this program
+            var AppendixText = ["Reference & Credit:\n",
+                "[1]. Webpage Developed by: Shuo XU, Ph.D, Email : ShuoXu@iastate.edu , st.charlie.xu@gmail.com",
+                "[2]. WebStorm: The Smartest JavaScript IDE - JetBrains, https://www.jetbrains.com/webstorm/"];
+            var Label_Appendix = document.createElement('label');
+            Label_Appendix.style.font = 1. / 80 * h + "px Arial";
+            Label_Appendix.style.position = "absolute";
+            Label_Appendix.style.left = 0 + "px";
+            Label_Appendix.style.top = 19. / 20 * h + "px";
+            Label_Appendix.style.height = h * 1. / 20 + "px";
+            Label_Appendix.style.width = w + "px";
+            Label_Appendix.style.textAlign = "left";
+            Label_Appendix.htmlFor = "id";
+            Label_Appendix.id = "Label_Appendix";
+            for (var i = 0; i < AppendixText.length; i++) {
+                Label_Appendix.appendChild(document.createTextNode(AppendixText[i]));
+                //Label_Appendix.innerHTML = AppendixText;
+                var br = document.createElement("br");
+                Label_Appendix.appendChild(br);
+            }
+            document.body.appendChild(Label_Appendix);
+        }
+
+
+    </script>
+    <script src="data/DataJs.js"></script>
+</head>
+
+
+<body onload="main()">
+<div id="Map_DIV" style="width: 600px; height: 400px;"></div>
+</body>
+</html>
